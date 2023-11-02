@@ -1,11 +1,17 @@
 package sanhak.shserver.utils;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.MultipleFileDownload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferProgress;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
@@ -17,48 +23,43 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.Base64;
+import java.util.List;
 
+@Slf4j
+@Component
 @Transactional(readOnly = true)
 @PropertySource(value = "application.properties")
 @RequiredArgsConstructor
-@Component
 public class S3Utils {
+    private final AmazonS3 amazonS3;
     private final TransferManager transferManager;
     private final AmazonS3Client amazonS3Client;
-
     private final String key = "computerandinformationengineerin";
     private String iv = "kwangwoonunivers";
     public static String algo = "AES/CBC/PKCS5Padding";
 
-
-
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
-    public void downloadFolder(String dir) throws IOException, InterruptedException {
+    public void downloadFolder(String dirName) {
         try {
             File localDirectory = new File("s3-download");
-            String tmp = URLDecoder.decode(dir,"utf-8");
-            MultipleFileDownload downloadDirectory = transferManager.downloadDirectory(bucket, tmp, localDirectory);
+            dirName = URLDecoder.decode(dirName, StandardCharsets.UTF_8);
 
-            System.out.println("[ test ] download progressing... start");
-            DecimalFormat decimalFormat = new DecimalFormat("##0.00");
-            while(!downloadDirectory.isDone()){
+            log.info("Download folder start");
+            MultipleFileDownload downloadDirectory = transferManager.downloadDirectory(bucket, dirName, localDirectory);
+            while(!downloadDirectory.isDone())
                 Thread.sleep(1000);
-                TransferProgress progress = downloadDirectory.getProgress();
-                double percentTransferred = progress.getPercentTransferred();
-                System.out.println("[ test ]" + decimalFormat.format(percentTransferred)+"% download progressing...");
-
-            }
-            System.out.println("[ test ] download directory from S3 succecss!");
+            log.info("Download folder finish");
         }
-        catch (IOException e) {
-            System.out.println("ERR");
-            e.getMessage();
+        catch (InterruptedException e) {
+            log.error(e.getMessage());
         }
     }
+
     public String putS3(String filePath, String fileName, ByteArrayOutputStream bos)throws IOException{
 
         byte[] data;
@@ -92,6 +93,34 @@ public class S3Utils {
         }
         return encryptStr;
     }
+
+    public InputStream downloadFileAsStream(String fileName) {
+        try {
+            fileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, fileName);
+            S3Object s3Object = amazonS3.getObject(getObjectRequest);
+            return s3Object.getObjectContent();
+        } catch (AmazonS3Exception e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    public void downloadFile(String fileName) {
+        try {
+            fileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, fileName);
+            File localDirectory = new File("s3-download");
+
+            log.info("Download file start");
+            Download download = transferManager.download(getObjectRequest, localDirectory);
+            while (!download.isDone())
+                Thread.sleep(1000);
+            log.info("Download file finish");
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+        }
+    }
+
     public String encryptAES256(String fileName) throws  Exception{
         Cipher cipher = Cipher.getInstance(algo);
         SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(),"AES");
