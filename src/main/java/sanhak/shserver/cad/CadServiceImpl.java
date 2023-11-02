@@ -7,20 +7,15 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import sanhak.shserver.aspose.AsposeUtils;
-import sanhak.shserver.s3.S3Utils;
+import sanhak.shserver.utils.AsposeUtils;
+import sanhak.shserver.utils.S3Utils;
 
-import javax.imageio.spi.ServiceRegistry;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 

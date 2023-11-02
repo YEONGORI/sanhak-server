@@ -1,4 +1,4 @@
-package sanhak.shserver.cad;
+package sanhak.shserver.config;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
