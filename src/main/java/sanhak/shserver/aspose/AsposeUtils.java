@@ -1,5 +1,14 @@
 package sanhak.shserver.aspose;
 
+import com.aspose.cad.Image;
+import com.aspose.cad.fileformats.cad.CadImage;
+import com.aspose.cad.fileformats.cad.cadconsts.CadEntityTypeName;
+import com.aspose.cad.fileformats.cad.cadobjects.CadBaseEntity;
+import com.aspose.cad.fileformats.cad.cadobjects.CadBlockEntity;
+import com.aspose.cad.fileformats.cad.cadobjects.CadMText;
+import com.aspose.cad.fileformats.cad.cadobjects.CadText;
+import com.aspose.cad.imageoptions.CadRasterizationOptions;
+import com.aspose.cad.imageoptions.JpegOptions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import sanhak.shserver.s3.S3Utils;
@@ -72,7 +81,7 @@ public class AsposeUtils {
                         CadText childObjectText = (CadText)entity;
                         index = index + childObjectText.getDefaultValue() + "| ";
                     }
-
+                    
                     else if (entity.getTypeName() == CadEntityTypeName.MTEXT) {
                         CadMText childObjectText = (CadMText)entity;
                         index += childObjectText.getText();
