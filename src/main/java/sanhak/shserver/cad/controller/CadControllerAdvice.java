@@ -19,10 +19,10 @@ public class CadControllerAdvice {
         return new ErrorResult(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler(RuntimeException.class)
-//    public ErrorResult internalExHandle(RuntimeException e) {
-//        log.error(e.getMessage());
-//        return new ErrorResult(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-//    }
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ErrorResult badRequestExHandle(IllegalArgumentException e) {
+        log.error(e.getMessage());
+        return new ErrorResult(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
 }

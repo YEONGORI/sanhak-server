@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 @Configuration
-@PropertySource(value = "application.properties")
 public class CadConfig {
     @Value("${spring.data.mongodb.uri}")
     private String connectionString;

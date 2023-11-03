@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/cad/data")
 public class CadController {
-    private final CadServiceImpl cadService;
+    private final CadService cadService;
 
     @GetMapping
     public ResponseEntity<?> getCadData(@RequestParam String searchText) {

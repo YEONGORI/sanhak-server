@@ -14,8 +14,6 @@ import sanhak.shserver.cad.dto.SimilarDatasReqDTO;
 import sanhak.shserver.utils.AsposeUtils;
 import sanhak.shserver.utils.S3Utils;
 
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -82,6 +80,11 @@ public class CadServiceImpl implements CadService {
 
     @Override
     public List<Cad> getSimilarData(SimilarDatasReqDTO reqDTO) {
-
+        String fileName = reqDTO.getFileName();
+        if (fileName.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        s3Utils.downloadFile(fileName);
+        return null;
     }
 }

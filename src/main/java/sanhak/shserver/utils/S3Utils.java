@@ -9,11 +9,9 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.MultipleFileDownload;
 import com.amazonaws.services.s3.transfer.TransferManager;
-import com.amazonaws.services.s3.transfer.TransferProgress;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,22 +22,20 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
 import java.util.Base64;
-import java.util.List;
 
 @Slf4j
 @Component
 @Transactional(readOnly = true)
-@PropertySource(value = "application.properties")
 @RequiredArgsConstructor
 public class S3Utils {
     private final AmazonS3 amazonS3;
     private final TransferManager transferManager;
     private final AmazonS3Client amazonS3Client;
-    private final String key = "computerandinformationengineerin";
-    private String iv = "kwangwoonunivers";
-    public static String algo = "AES/CBC/PKCS5Padding";
+
+    private static final String key = "computerandinformationengineerin";
+    private static final String iv = "kwangwoonunivers";
+    private static final String algo = "AES/CBC/PKCS5Padding";
 
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
@@ -94,29 +90,19 @@ public class S3Utils {
         return encryptStr;
     }
 
-    public InputStream downloadFileAsStream(String fileName) {
-        try {
-            fileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
-            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, fileName);
-            S3Object s3Object = amazonS3.getObject(getObjectRequest);
-            return s3Object.getObjectContent();
-        } catch (AmazonS3Exception e) {
-            log.error(e.getMessage());
-        }
-    }
-
     public void downloadFile(String fileName) {
         try {
             fileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
             GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, fileName);
-            File localDirectory = new File("s3-download");
+            File file = new File("similar.jpeg");
 
             log.info("Download file start");
-            Download download = transferManager.download(getObjectRequest, localDirectory);
+            Download download = transferManager.download(getObjectRequest, file);
             while (!download.isDone())
                 Thread.sleep(1000);
             log.info("Download file finish");
-        } catch (InterruptedException e) {
+            log.debug("Downloaded file name: " + file.getName());
+        } catch (InterruptedException | AmazonS3Exception e) {
             log.error(e.getMessage());
         }
     }

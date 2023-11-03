@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class AsposeUtils {
     private final S3Utils s3Utils;
     public static final String dataDir = setDataPath() + "s3-download" + File.separator;
