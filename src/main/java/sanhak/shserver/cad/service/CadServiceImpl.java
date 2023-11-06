@@ -12,10 +12,12 @@ import sanhak.shserver.cad.CadService;
 import sanhak.shserver.cad.dto.SaveCadDatasReqDTO;
 import sanhak.shserver.cad.dto.SimilarDatasReqDTO;
 import sanhak.shserver.utils.AsposeUtils;
+import sanhak.shserver.utils.PythonUtils;
 import sanhak.shserver.utils.S3Utils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,22 +31,31 @@ public class CadServiceImpl implements CadService {
     private final MongoTemplate mongoTemplate;
     private final S3Utils s3Utils;
     private final AsposeUtils asposeUtils;
+    private final PythonUtils pythonUtils;
 
 
     public void saveCadData(SaveCadDatasReqDTO reqDTO) {
         String folder = reqDTO.getProjectFolder();
         String author = reqDTO.getAuthor();
 
-        s3Utils.downloadFolder(folder);
+        Map<String, String[]> fileInfo;
+        if (folder.endsWith(".dwg")) {
+            s3Utils.downloadFile(folder);
+            fileInfo = asposeUtils.searchCadFile(folder);
+        } else {
+            s3Utils.downloadFolder(folder);
+            fileInfo = asposeUtils.searchCadFileInDataDir(folder);
+        }
 
-        Map<String, String[]> fileInfo = asposeUtils.searchCadFleInDataDir(folder);
+        pythonUtils.saveTfIdf(folder);
 
         for (Map.Entry<String, String[]> entry: fileInfo.entrySet()) {
             String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             Cad cad = new Cad(author, folder, entry.getValue()[0], entry.getValue()[1], entry.getKey(), entry.getValue()[2], date);
-
+            log.info("mongo atlas upload start");
+            log.info("Cad DATA: " + cad);
             cadRepository.save(cad);
-//                mongoTemplate.insert(cad, "cad");
+            log.info("mongo atlas upload finish");
         }
     }
 
@@ -57,12 +68,11 @@ public class CadServiceImpl implements CadService {
             String Col[] = {"title", "mainCategory" ,"subCategory", "index"};
             Query query_qrr[][] = new Query[Col.length][eachText.length];
 
-            for(int i=0;i<Col.length;i++){
-                for(int j=0;j<eachText.length;j++){
+            for(int i=0;i<Col.length;i++) {
+                for(int j=0;j<eachText.length;j++) {
                     query_qrr[i][j] = new Query();
                     query_qrr[i][j].addCriteria(Criteria.where(Col[i]).regex(eachText[j]));
                 }
-
             }
             List<Cad> list = mongoTemplate.find(query_qrr[0][0],Cad.class,"cad");
             for(int i=0;i<eachText.length;i++){
@@ -85,6 +95,7 @@ public class CadServiceImpl implements CadService {
             throw new IllegalArgumentException();
         }
         s3Utils.downloadFile(fileName);
+
         return null;
     }
 }

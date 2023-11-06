@@ -42,7 +42,7 @@ public class S3Utils {
 
     public void downloadFolder(String dirName) {
         try {
-            File localDirectory = new File("s3-download");
+            File localDirectory = new File(dirName);
             dirName = URLDecoder.decode(dirName, StandardCharsets.UTF_8);
 
             log.info("Download folder start");
@@ -87,6 +87,7 @@ public class S3Utils {
         }catch (Exception e){
             e.printStackTrace();
         }
+        log.info("upload image finish");
         return encryptStr;
     }
 
@@ -94,7 +95,7 @@ public class S3Utils {
         try {
             fileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
             GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, fileName);
-            File file = new File("similar.jpeg");
+            File file = new File(fileName);
 
             log.info("Download file start");
             Download download = transferManager.download(getObjectRequest, file);

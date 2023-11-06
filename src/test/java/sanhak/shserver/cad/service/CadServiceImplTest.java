@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import sanhak.shserver.cad.Cad;
 import sanhak.shserver.cad.CadService;
+import sanhak.shserver.cad.dto.SaveCadDatasReqDTO;
 import sanhak.shserver.cad.dto.SimilarDatasReqDTO;
 
 import java.util.List;
@@ -19,6 +20,8 @@ class CadServiceImplTest {
 
     @Test
     void saveCadData() {
+//        SaveCadDatasReqDTO.builder().projectFolder()
+//        cadService.saveCadData();
     }
 
     @Test

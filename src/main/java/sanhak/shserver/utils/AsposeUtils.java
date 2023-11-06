@@ -10,6 +10,7 @@ import com.aspose.cad.fileformats.cad.cadobjects.CadText;
 import com.aspose.cad.imageoptions.CadRasterizationOptions;
 import com.aspose.cad.imageoptions.JpegOptions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AsposeUtils {
@@ -32,11 +34,27 @@ public class AsposeUtils {
         return dir + File.separator;
     }
 
-    public Map<String, String[]> searchCadFleInDataDir(String dir) {
+    public Map<String, String[]> searchCadFile(String fileName) {
+        Map<String, String[]> fileInfo = new HashMap<>();
+
+        String filePath = setDataPath() + fileName;
+        try {
+            String fileIndex = extractTextInCadFile(filePath);
+            ByteArrayOutputStream os = CadToJpeg(filePath);
+            String s3Url = s3Utils.putS3("image/", fileName, os);
+            fileInfo.put(fileIndex, new String[]{"", fileName, s3Url});
+            log.info("CAD file data start");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        log.info("CAD file data finish");
+        return fileInfo;
+    }
+
+    public Map<String, String[]> searchCadFileInDataDir(String dir) {
         Map<String, String[]> fileInfo = new HashMap<>();
         try {
             Files.walkFileTree(Paths.get(dataDir + dir), new SimpleFileVisitor<>() {
-
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException{
                     if (!Files.isDirectory(file) && file.getFileName().toString().contains(".dwg")) {
@@ -52,7 +70,7 @@ public class AsposeUtils {
                 }
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return fileInfo;
     }
@@ -84,6 +102,21 @@ public class AsposeUtils {
     }
 
     public ByteArrayOutputStream CadToJpeg(String filePath) {
+        Image image = Image.load(filePath);
+
+        CadRasterizationOptions rasterizationOptions = new CadRasterizationOptions();
+        rasterizationOptions.setPageWidth(200);
+        rasterizationOptions.setPageHeight(200);
+
+        JpegOptions options = new JpegOptions();
+        options.setVectorRasterizationOptions(rasterizationOptions);
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        image.save(os, options);
+        return os;
+    }
+
+    public ByteArrayOutputStream CadToJpeg2(String filePath) {
         try {
             Image cadImage = Image.load(filePath);
 
