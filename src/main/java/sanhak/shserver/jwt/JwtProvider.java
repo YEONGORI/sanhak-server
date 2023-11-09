@@ -14,13 +14,11 @@ import java.util.Date;
 @Getter
 @Setter
 @ToString
-
 @Component
 public class JwtProvider {
 
     @Value("${jwt.password}")
     private String secretKey;
-
 
 
     //==토큰 생성 메소드==//

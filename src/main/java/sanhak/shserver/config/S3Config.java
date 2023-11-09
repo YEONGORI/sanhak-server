@@ -1,4 +1,4 @@
-package sanhak.shserver.s3;
+package sanhak.shserver.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -14,7 +14,6 @@ import org.springframework.context.annotation.PropertySource;
 
 
 @Configuration
-@PropertySource(value = "application.properties")
 public class S3Config {
     @Value("${cloud.aws.credentials.access-key}")
     private String accessKey;
@@ -28,24 +27,21 @@ public class S3Config {
     @Bean
     @Primary
     public BasicAWSCredentials awsCredentialsProvider(){
-        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secretKey);
-        return basicAWSCredentials;
+        return new BasicAWSCredentials(accessKey, secretKey);
     }
 
     @Bean
     public AmazonS3 amazonS3(){
-        AmazonS3 s3Builder = AmazonS3ClientBuilder.standard()
+        return AmazonS3ClientBuilder.standard()
                 .withRegion(region)
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentialsProvider()))
                 .build();
-        return s3Builder;
     }
 
     @Bean
     public TransferManager transferManager(){
-        TransferManager transferManager = TransferManagerBuilder.standard()
+        return TransferManagerBuilder.standard()
                 .withS3Client((amazonS3()))
                 .build();
-        return transferManager;
     }
 }
