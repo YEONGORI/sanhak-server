@@ -27,7 +27,6 @@ import java.util.concurrent.*;
 @RequiredArgsConstructor
 public class AsposeUtils {
     private final S3Utils s3Utils;
-    public static final String dataDir = setDataPath() + "s3-download" + File.separator;
 
     public static String setDataPath() {
         File dir = new File(System.getProperty("user.dir"));
@@ -38,23 +37,21 @@ public class AsposeUtils {
         Map<String, String[]> fileInfo = new HashMap<>();
 
         String filePath = setDataPath() + fileName;
-        try {
-            String fileIndex = extractTextInCadFile(filePath);
-            ByteArrayOutputStream os = CadToJpeg(filePath);
-            String s3Url = s3Utils.putS3("image/", fileName, os);
-            fileInfo.put(fileIndex, new String[]{"", fileName, s3Url});
-            log.info("CAD file data start");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
+        String fileIndex = extractTextInCadFile(filePath);
+        ByteArrayOutputStream os = CadToJpeg(filePath);
+        String s3Url = s3Utils.uploadS3("image/", fileName, os);
+        fileInfo.put(fileIndex, new String[]{"", fileName, s3Url});
+        log.info("CAD file data start");
         log.info("CAD file data finish");
         return fileInfo;
     }
 
     public Map<String, String[]> searchCadFileInDataDir(String dir) {
+        String projectDir = setDataPath() + dir + File.separator;
         Map<String, String[]> fileInfo = new HashMap<>();
+
         try {
-            Files.walkFileTree(Paths.get(dataDir + dir), new SimpleFileVisitor<>() {
+            Files.walkFileTree(Paths.get(projectDir + dir), new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException{
                     if (!Files.isDirectory(file) && file.getFileName().toString().contains(".dwg")) {
@@ -62,7 +59,7 @@ public class AsposeUtils {
                         String filePath = file.toAbsolutePath().toString();
                         String fileIndex = extractTextInCadFile(filePath);
                         ByteArrayOutputStream bos = CadToJpeg(filePath);
-                        String S3url = s3Utils.putS3("image/", fileName, bos);
+                        String S3url = s3Utils.uploadS3("image/", fileName, bos);
                         filePath = filePath.substring(filePath.indexOf(dir) + dir.length(), filePath.indexOf(fileName) - 1);
                         fileInfo.put(fileIndex, new String[]{filePath, fileName, S3url});
                     }

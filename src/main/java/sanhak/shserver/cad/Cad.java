@@ -19,6 +19,7 @@ public class Cad {
     private String title;
     private String index;
     private String s3Url;
+    private CadLabel cadLabel;
     private String createdAt;
 
 

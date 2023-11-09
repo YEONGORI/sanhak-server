@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import sanhak.shserver.cad.Cad;
+import sanhak.shserver.cad.CadLabel;
 import sanhak.shserver.cad.CadRepository;
 import sanhak.shserver.cad.CadService;
 import sanhak.shserver.cad.dto.SaveCadDatasReqDTO;
@@ -17,10 +18,7 @@ import sanhak.shserver.utils.S3Utils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -51,7 +49,16 @@ public class CadServiceImpl implements CadService {
 
         for (Map.Entry<String, String[]> entry: fileInfo.entrySet()) {
             String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            Cad cad = new Cad(author, folder, entry.getValue()[0], entry.getValue()[1], entry.getKey(), entry.getValue()[2], date);
+            Cad cad = Cad.builder()
+                    .author(author)
+                    .mainCategory(folder)
+                    .subCategory(entry.getValue()[0])
+                    .title(entry.getValue()[1])
+                    .index(entry.getKey())
+                    .s3Url(entry.getValue()[2])
+                    .createdAt(date)
+                    .cadLabel(pythonUtils.startCNN(entry.getValue()[2]))
+                    .build();
             log.info("mongo atlas upload start");
             log.info("Cad DATA: " + cad);
             cadRepository.save(cad);
@@ -65,8 +72,8 @@ public class CadServiceImpl implements CadService {
                 return null;
             String[] eachText = searchText.split(" ");
 
-            String Col[] = {"title", "mainCategory" ,"subCategory", "index"};
-            Query query_qrr[][] = new Query[Col.length][eachText.length];
+            String[] Col = {"title", "mainCategory" ,"subCategory", "index"};
+            Query[][] query_qrr = new Query[Col.length][eachText.length];
 
             for(int i=0;i<Col.length;i++) {
                 for(int j=0;j<eachText.length;j++) {
@@ -95,7 +102,11 @@ public class CadServiceImpl implements CadService {
             throw new IllegalArgumentException();
         }
         s3Utils.downloadFile(fileName);
+        Cad cad = cadRepository.findCadByTitle(fileName);
+        CadLabel cadLabel = cad.getCadLabel();
 
-        return null;
+        List<Cad> cads = cadRepository.findAllByCadLabel(cadLabel);
+
+        return cads;
     }
 }

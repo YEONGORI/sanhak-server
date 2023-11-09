@@ -10,5 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 public class SaveCadDatasReqDTO {
     private String projectFolder;
+
     private String author;
 }
