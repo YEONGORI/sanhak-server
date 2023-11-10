@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import sanhak.shserver.cad.CadLabel;
 
-import java.util.Map;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor

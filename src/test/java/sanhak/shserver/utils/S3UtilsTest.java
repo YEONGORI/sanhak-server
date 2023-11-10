@@ -2,9 +2,11 @@ package sanhak.shserver.utils;
 
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,27 +20,26 @@ class S3UtilsTest {
     private final static String testFile = "03-ST-BTS-102-001 시스템 계통도.dwg";
 
     @Test
+    @DisplayName("폴더 다운로드 테스트")
+    @BeforeTestClass
     void downloadFolder() {
         Assertions.assertDoesNotThrow(() -> s3Utils.downloadFolder(testDir));
         Assertions.assertThrows(AmazonS3Exception.class,
-                () -> s3Utils.downloadFolder("null2"));
+                () -> s3Utils.downloadFolder("null"));
     }
 
     @Test
+    @DisplayName("폴더 / 파일 업로드 테스트")
     void uploadS3() {
-
-//        Assertions.assertThrows()
+//        s3Utils.uploadS3(, testFile, )
     }
 
+
     @Test
+    @DisplayName("파일 다운로드 테스트")
     void downloadFile() {
         Assertions.assertDoesNotThrow(() -> s3Utils.downloadFile(testFile));
         Assertions.assertThrows(AmazonS3Exception.class,
                 () -> s3Utils.downloadFile("null"));
-    }
-
-    @Test
-    void encryptAES256() {
-        s3Utils.encryptAES256
     }
 }

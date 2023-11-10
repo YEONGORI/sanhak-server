@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -48,14 +50,15 @@ public class S3Utils {
 
     public void downloadFolder(String dirName) {
         try {
-            File localDirectory = new File(dirName);
             dirName = URLDecoder.decode(dirName, StandardCharsets.UTF_8);
-
+            File localDirectory = new File(dirName);
             log.info("Download folder start");
             MultipleFileDownload downloadDirectory = transferManager.downloadDirectory(bucket, dirName, localDirectory);
-            while(!downloadDirectory.isDone())
-                Thread.sleep(1000);
+            downloadDirectory.waitForCompletion();
             log.info("Download folder finish");
+            if (!Files.isDirectory(Paths.get(dirName))) {
+                throw new AmazonS3Exception("'dirName' Object does not exist");
+            }
         } catch (InterruptedException |  AmazonS3Exception e) {
             log.error(e.getMessage());
             throw new AmazonS3Exception(e.getMessage());
@@ -137,12 +140,12 @@ public class S3Utils {
 
             log.info("Download file start");
             Download download = transferManager.download(getObjectRequest, file);
-            while (!download.isDone())
-                Thread.sleep(1000);
+            download.waitForCompletion();
             log.info("Download file finish");
             log.debug("Downloaded file name: " + file.getName());
         } catch (InterruptedException | AmazonS3Exception e) {
             log.error(e.getMessage());
+            throw new AmazonS3Exception(e.getMessage());
         }
     }
 
