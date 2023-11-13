@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -48,64 +50,28 @@ public class S3Utils {
 
     public void downloadFolder(String dirName) {
         try {
-            File localDirectory = new File(dirName);
             dirName = URLDecoder.decode(dirName, StandardCharsets.UTF_8);
-
+            File localDirectory = new File(dirName);
             log.info("Download folder start");
             MultipleFileDownload downloadDirectory = transferManager.downloadDirectory(bucket, dirName, localDirectory);
-            while(!downloadDirectory.isDone())
-                Thread.sleep(1000);
+            downloadDirectory.waitForCompletion();
             log.info("Download folder finish");
+            if (!Files.isDirectory(Paths.get(dirName))) {
+                throw new AmazonS3Exception("'dirName' Object does not exist");
+            }
         } catch (InterruptedException |  AmazonS3Exception e) {
             log.error(e.getMessage());
             throw new AmazonS3Exception(e.getMessage());
         }
     }
 
-//    public String putS3(String filePath, String fileName, ByteArrayOutputStream bos)throws IOException{
-//
-//        byte[] data;
-//        String encryptStr="";
-//        if(bos == null){
-//            try {
-//                encryptStr = encryptAES256("https://dwg-upload.s3.ap-northeast-2.amazonaws.com/image/images.jpeg");
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }
-//            return encryptStr;
-//        }
-//        else{
-//            data = bos.toByteArray();
-//        }
-//        ByteArrayInputStream bin = new ByteArrayInputStream(data);
-//
-//        ObjectMetadata metadata = new ObjectMetadata();
-//        metadata.setContentType(MediaType.IMAGE_JPEG_VALUE);
-//        metadata.setContentLength(data.length);
-//
-//        String S3_fileName = fileName.substring(0,fileName.length()-4) + ".jpeg";
-//
-//        amazonS3Client.putObject(bucket,filePath+S3_fileName,bin, metadata);
-//        String PathUrl = amazonS3Client.getUrl(bucket,filePath).toString();
-//        bin.close();
-//        try {
-//            encryptStr = encryptAES256(PathUrl + S3_fileName);
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-//        log.info("upload image finish");
-//        return encryptStr;
-//    }
-
     public String uploadS3(String filePath, String fileName, ByteArrayOutputStream bos) {
         try {
             String defaultUrl = "https://dwg-upload.s3.ap-northeast-2.amazonaws.com/image/images.jpeg";
 
             String fileUrl = (bos == null) ? defaultUrl : uploadFiles(filePath, fileName, bos);
-            String encryptedUrl = encryptAES256(fileUrl);
 
-            log.info("upload image finish");
-            return encryptedUrl;
+            return encryptAES256(fileUrl);
         } catch (IOException e) {
             log.error("Error occurred while uploading to S3 or encrypting the URL", e);
             throw new RuntimeException(e);
@@ -137,12 +103,12 @@ public class S3Utils {
 
             log.info("Download file start");
             Download download = transferManager.download(getObjectRequest, file);
-            while (!download.isDone())
-                Thread.sleep(1000);
+            download.waitForCompletion();
             log.info("Download file finish");
             log.debug("Downloaded file name: " + file.getName());
         } catch (InterruptedException | AmazonS3Exception e) {
             log.error(e.getMessage());
+            throw new AmazonS3Exception(e.getMessage());
         }
     }
 
