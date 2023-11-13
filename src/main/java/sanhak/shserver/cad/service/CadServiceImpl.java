@@ -44,9 +44,8 @@ public class CadServiceImpl implements CadService {
             fileInfo = asposeUtils.searchCadFileInDataDir(folder);
         }
 
-        pythonUtils.saveTfIdf();
-        pythonUtils.updateCNNClassification(folder);
 
+        log.info("mongo atlas upload start");
         for (Map.Entry<String, String[]> entry: fileInfo.entrySet()) {
             String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             Cad cad = Cad.builder()
@@ -61,10 +60,15 @@ public class CadServiceImpl implements CadService {
                     .cadLabel("")
                     .tfidf("")
                     .build();
-            log.info("mongo atlas upload start");
             cadRepository.save(cad);
-            log.info("mongo atlas upload finish");
         }
+        log.info("mongo atlas upload finish");
+
+        pythonUtils.saveTfIdf();
+        log.info("save Tf-Idf is done");
+
+        pythonUtils.updateCNNClassification(folder);
+        log.info("update CNN Classification is done");
     }
 
     public Set<Cad> searchCadFile(String searchText) {
@@ -112,12 +116,4 @@ public class CadServiceImpl implements CadService {
 //        return null;
 //    }
 
-    @Override
-    public Set<Cad> getSimilarData(SimilarDatasReqDTO reqDTO) {
-        String id = reqDTO.getId();
-        if (id.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-        return pythonUtils.getSimilarCads(id);
-    }
 }

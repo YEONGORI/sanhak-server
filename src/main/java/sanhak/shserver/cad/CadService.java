@@ -10,5 +10,4 @@ import java.util.Set;
 public interface CadService {
     void saveCadData(SaveCadDatasReqDTO reqDTO);
     Set<Cad> searchCadFile(String searchText);
-    Set<Cad> getSimilarData(SimilarDatasReqDTO reqDTO);
 }

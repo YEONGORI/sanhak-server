@@ -52,10 +52,10 @@ public class S3Utils {
         try {
             dirName = URLDecoder.decode(dirName, StandardCharsets.UTF_8);
             File localDirectory = new File(dirName);
-            log.info("Download folder start");
+            log.info("Download folder started");
             MultipleFileDownload downloadDirectory = transferManager.downloadDirectory(bucket, dirName, localDirectory);
             downloadDirectory.waitForCompletion();
-            log.info("Download folder finish");
+            log.info("Download folder finished");
             if (!Files.isDirectory(Paths.get(dirName))) {
                 throw new AmazonS3Exception("'dirName' Object does not exist");
             }
