@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.util.UriBuilder;
 import sanhak.shserver.cad.Cad;
 import sanhak.shserver.cad.dto.SimilarDatasResDTO;
@@ -36,11 +37,16 @@ public class PythonUtils {
     }
 
     public void saveTfIdf() {
-        String block = webClientTfIdf.get()
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-        log.info(block);
+        try {
+            String block = webClientTfIdf.get()
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            log.info(block);
+        } catch (WebClientException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException();
+        }
     }
 
     public void updateCNNClassification(String mainCategory) {
@@ -60,6 +66,7 @@ public class PythonUtils {
             log.info(response);
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
+            throw new RuntimeException();
         }
     }
 }
