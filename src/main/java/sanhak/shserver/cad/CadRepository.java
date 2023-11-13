@@ -10,8 +10,9 @@ import java.util.Set;
 
 @Repository
 public interface CadRepository extends MongoRepository<Cad, String> {
-    Set<Cad> findAllByCadLabel(String cadLabel);
     Cad findCadByTitle(String title);
+    Cad findCadById(String id);
+    Set<Cad> findAllByCadLabel(String cadLabel);
     Set<Cad> findAllByTitle(String title);
     Set<Cad> findAllByMainCategory(String mainCategory);
     Set<Cad> findAllBySubCategory(String subCategory);

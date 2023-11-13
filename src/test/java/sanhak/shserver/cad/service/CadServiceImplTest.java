@@ -48,7 +48,7 @@ class CadServiceImplTest {
     @Test
     void getSimilarData() {
         SimilarDatasReqDTO reqDTO = SimilarDatasReqDTO.builder()
-                .fileName("015. T1001026-011 910정거장 출입통제설비 CABLE WIRING DIAGRAM.jpeg")
+                .id("015. T1001026-011 910정거장 출입통제설비 CABLE WIRING DIAGRAM.jpeg")
                 .build();
         Set<Cad> cads = cadService.getSimilarData(reqDTO);
     }

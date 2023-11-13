@@ -70,7 +70,7 @@ public class S3Utils {
             String defaultUrl = "https://dwg-upload.s3.ap-northeast-2.amazonaws.com/image/images.jpeg";
 
             String fileUrl = (bos == null) ? defaultUrl : uploadFiles(filePath, fileName, bos);
-
+            log.info("S3Utils.uploadS3 finished");
             return encryptAES256(fileUrl);
         } catch (IOException e) {
             log.error("Error occurred while uploading to S3 or encrypting the URL", e);
