@@ -9,6 +9,7 @@ import sanhak.shserver.cad.dto.SimilarDatasReqDTO;
 import sanhak.shserver.cad.service.CadServiceImpl;
 
 import java.util.List;
+import java.util.Set;
 
 @ResponseBody
 @RestController
@@ -19,7 +20,7 @@ public class CadController {
 
     @GetMapping
     public ResponseEntity<?> getCadData(@RequestParam String searchText) {
-        List<Cad> cads = cadService.searchCadFile(searchText);
+        Set<Cad> cads = cadService.searchCadFile(searchText);
         return new ResponseEntity<>(cads, HttpStatus.OK);
     }
 
@@ -31,7 +32,7 @@ public class CadController {
 
     @GetMapping("/similar")
     public ResponseEntity<?> getSimilarData(@RequestBody SimilarDatasReqDTO reqDTO) {
-        List<Cad> cads = cadService.getSimilarData(reqDTO);
+        Set<Cad> cads = cadService.getSimilarData(reqDTO);
         return new ResponseEntity<>(cads, HttpStatus.OK);
     }
 }
