@@ -13,13 +13,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Cad {
     @Id
     private String id;
+
     private String author;
+
     private String mainCategory;
+
     private String subCategory;
+
     private String title;
+
     private String index;
+
     private String s3Url;
+
     private String cadLabel;
+
     private String tfidf;
+
     private String createdAt;
 }

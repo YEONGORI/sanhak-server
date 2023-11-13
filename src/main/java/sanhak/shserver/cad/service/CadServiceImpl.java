@@ -17,10 +17,7 @@ import sanhak.shserver.utils.S3Utils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -70,7 +67,22 @@ public class CadServiceImpl implements CadService {
         }
     }
 
-    public List<Cad> searchCadFile(String searchText) {
+    public Set<Cad> searchCadFile(String searchText) {
+        String[] split = searchText.split(" ");
+        Set<Cad> cads = new HashSet<>();
+
+        for (String st : split) {
+            cads.addAll(cadRepository.findAllByAuthor(st));
+            cads.addAll(cadRepository.findAllByTitle(st));
+            cads.addAll(cadRepository.findAllByIndex(st));
+            cads.addAll(cadRepository.findAllByMainCategory(st));
+            cads.addAll(cadRepository.findAllBySubCategory(st));
+            cads.addAll(cadRepository.findAllByCadLabel(st));
+        }
+        return cads;
+    }
+
+    public List<Cad> searchCadFile1(String searchText) {
         try {
             if (Objects.equals(searchText, ""))
                 return null;
@@ -101,7 +113,7 @@ public class CadServiceImpl implements CadService {
     }
 
     @Override
-    public List<Cad> getSimilarData(SimilarDatasReqDTO reqDTO) {
+    public Set<Cad> getSimilarData(SimilarDatasReqDTO reqDTO) {
         String fileName = reqDTO.getFileName();
         if (fileName.isEmpty()) {
             throw new IllegalArgumentException();
