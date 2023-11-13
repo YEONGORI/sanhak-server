@@ -60,6 +60,7 @@ public class PythonUtils {
                 .bodyToMono(String.class)
                 .block();
         log.info(block);
+
         log.info("PythonUtils.getSimilarCads");
         return null;
     }
