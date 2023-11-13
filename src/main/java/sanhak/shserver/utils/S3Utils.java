@@ -65,50 +65,13 @@ public class S3Utils {
         }
     }
 
-//    public String putS3(String filePath, String fileName, ByteArrayOutputStream bos)throws IOException{
-//
-//        byte[] data;
-//        String encryptStr="";
-//        if(bos == null){
-//            try {
-//                encryptStr = encryptAES256("https://dwg-upload.s3.ap-northeast-2.amazonaws.com/image/images.jpeg");
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }
-//            return encryptStr;
-//        }
-//        else{
-//            data = bos.toByteArray();
-//        }
-//        ByteArrayInputStream bin = new ByteArrayInputStream(data);
-//
-//        ObjectMetadata metadata = new ObjectMetadata();
-//        metadata.setContentType(MediaType.IMAGE_JPEG_VALUE);
-//        metadata.setContentLength(data.length);
-//
-//        String S3_fileName = fileName.substring(0,fileName.length()-4) + ".jpeg";
-//
-//        amazonS3Client.putObject(bucket,filePath+S3_fileName,bin, metadata);
-//        String PathUrl = amazonS3Client.getUrl(bucket,filePath).toString();
-//        bin.close();
-//        try {
-//            encryptStr = encryptAES256(PathUrl + S3_fileName);
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-//        log.info("upload image finish");
-//        return encryptStr;
-//    }
-
     public String uploadS3(String filePath, String fileName, ByteArrayOutputStream bos) {
         try {
             String defaultUrl = "https://dwg-upload.s3.ap-northeast-2.amazonaws.com/image/images.jpeg";
 
             String fileUrl = (bos == null) ? defaultUrl : uploadFiles(filePath, fileName, bos);
-            String encryptedUrl = encryptAES256(fileUrl);
 
-            log.info("upload image finish");
-            return encryptedUrl;
+            return encryptAES256(fileUrl);
         } catch (IOException e) {
             log.error("Error occurred while uploading to S3 or encrypting the URL", e);
             throw new RuntimeException(e);

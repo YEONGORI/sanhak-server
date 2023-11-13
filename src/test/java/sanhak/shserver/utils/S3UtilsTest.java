@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.event.annotation.BeforeTestClass;
 
+import java.io.ByteArrayOutputStream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class S3UtilsTest {
     @Autowired
     S3Utils s3Utils;
+    @Autowired
+    AsposeUtils asposeUtils;
 
     private final static String testDir = "[18ED17] 완주삼봉지구스마트도시 정보통신 설계용역/";
     private final static String testFile = "03-ST-BTS-102-001 시스템 계통도.dwg";
@@ -31,7 +35,8 @@ class S3UtilsTest {
     @Test
     @DisplayName("폴더 / 파일 업로드 테스트")
     void uploadS3() {
-//        s3Utils.uploadS3(, testFile, )
+        ByteArrayOutputStream os = asposeUtils.CadToJpeg(testFile);
+        Assertions.assertDoesNotThrow(() -> s3Utils.uploadS3("image/", testFile, os));
     }
 
 

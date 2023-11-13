@@ -20,7 +20,6 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
 
 @Slf4j
 @Component
@@ -53,7 +52,7 @@ public class AsposeUtils {
         try {
             Files.walkFileTree(Paths.get(projectDir + dir), new SimpleFileVisitor<>() {
                 @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException{
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     if (!Files.isDirectory(file) && file.getFileName().toString().contains(".dwg")) {
                         String fileName = file.getFileName().toString();
                         String filePath = file.toAbsolutePath().toString();
@@ -73,27 +72,27 @@ public class AsposeUtils {
     }
 
     public static String extractTextInCadFile(String fileName) {
-        String index = "";
+        StringBuilder index = new StringBuilder();
         try {
             CadImage cadImage = (CadImage) CadImage.load(fileName);
             for (CadBlockEntity blockEntity : cadImage.getBlockEntities().getValues()) {
                 for (CadBaseEntity entity : blockEntity.getEntities()) {
                     if (entity.getTypeName() == CadEntityTypeName.TEXT) {
                         CadText childObjectText = (CadText)entity;
-                        index = index + childObjectText.getDefaultValue() + "| ";
+                        index.append(childObjectText.getDefaultValue()).append("| ");
                     }
                     
                     else if (entity.getTypeName() == CadEntityTypeName.MTEXT) {
                         CadMText childObjectText = (CadMText)entity;
-                        index += childObjectText.getText();
-                        index += "| ";
+                        index.append(childObjectText.getText());
+                        index.append("| ");
                     }
 
                 }
             }
-            return index;
+            return index.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return "";
     }
@@ -111,43 +110,5 @@ public class AsposeUtils {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         image.save(os, options);
         return os;
-    }
-
-    public ByteArrayOutputStream CadToJpeg2(String filePath) {
-        try {
-            Image cadImage = Image.load(filePath);
-
-            CadRasterizationOptions rasterizationOptions = new CadRasterizationOptions();
-            rasterizationOptions.setPageHeight(200);
-            rasterizationOptions.setPageWidth(200);
-
-            JpegOptions options = new JpegOptions();
-
-            options.setVectorRasterizationOptions(rasterizationOptions);
-
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-            ExecutorService executor = Executors.newCachedThreadPool();
-            Callable<Object> task = new Callable<Object>() {
-                @Override
-                public Object call() throws Exception {
-                    cadImage.save(bos, options);
-                    System.out.println("success");
-                    return bos;
-                }
-            };
-            Future<Object> future = executor.submit(task);
-            executor.shutdown();
-            try {
-                Object result = future.get(10, TimeUnit.SECONDS);
-            } catch (TimeoutException | ExecutionException | InterruptedException time_e) {
-                time_e.printStackTrace();
-                return null;
-            }
-            return bos;
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
     }
 }

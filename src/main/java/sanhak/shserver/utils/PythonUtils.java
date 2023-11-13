@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 import sanhak.shserver.cad.CadLabel;
 
 @Slf4j
@@ -18,16 +17,17 @@ public class PythonUtils {
     private String cnnUrl;
 
     public void saveTfIdf(String folder) {
-        WebClient webClient = WebClient.builder().baseUrl(tfIdfUrl).build();
-
-        String block = webClient.get().retrieve().bodyToMono(String.class).block();
-        log.info(block);
+//        WebClient webClient = WebClient.builder().baseUrl(tfIdfUrl).build();
+//
+//        String block = webClient.get().retrieve().bodyToMono(String.class).block();
+//        log.info(block);
     }
 
     public CadLabel startCNN(String s3Url) {
-        WebClient webClient = WebClient.builder().baseUrl(cnnUrl).build();
-
-        String block = webClient.get().retrieve().bodyToMono(String.class).block();
-        return CadLabel.valueOf(block);
+//        WebClient webClient = WebClient.builder().baseUrl(cnnUrl).build();
+//
+//        String block = webClient.get().retrieve().bodyToMono(String.class).block();
+//        return CadLabel.valueOf(block);
+        return CadLabel.배치도;
     }
 }
