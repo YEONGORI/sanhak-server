@@ -29,10 +29,4 @@ public class CadController {
         cadService.saveCadData(reqDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-    @GetMapping("/similar")
-    public ResponseEntity<?> getSimilarData(@RequestBody SimilarDatasReqDTO reqDTO) {
-        Set<Cad> cads = cadService.getSimilarData(reqDTO);
-        return new ResponseEntity<>(cads, HttpStatus.OK);
-    }
 }

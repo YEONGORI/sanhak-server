@@ -10,9 +10,6 @@ import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import java.io.ByteArrayOutputStream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 class S3UtilsTest {
     @Autowired

@@ -101,8 +101,8 @@ public class AsposeUtils {
         Image image = Image.load(filePath);
 
         CadRasterizationOptions rasterizationOptions = new CadRasterizationOptions();
-        rasterizationOptions.setPageWidth(200);
-        rasterizationOptions.setPageHeight(200);
+        rasterizationOptions.setPageWidth(1920);
+        rasterizationOptions.setPageHeight(1680);
 
         JpegOptions options = new JpegOptions();
         options.setVectorRasterizationOptions(rasterizationOptions);
