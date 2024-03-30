@@ -4,9 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import sanhak.shserver.cad.Cad;
-import sanhak.shserver.cad.CadService;
-import sanhak.shserver.cad.dto.SaveCadDatasReqDTO;
-import sanhak.shserver.utils.S3Utils;
+import sanhak.shserver.cad.dto.SaveCadsReq;
+import sanhak.shserver.infra.S3Utils;
 
 import java.util.Set;
 
@@ -26,13 +25,8 @@ class CadServiceImplTest {
 
     @Test
     void saveCadData() {
-        SaveCadDatasReqDTO reqDTO = SaveCadDatasReqDTO.builder()
-                .projectFolder(testDir)
-                .author("이상평")
-                .build();
-
         assertDoesNotThrow(() ->
-                cadService.saveCadData(reqDTO)
+                cadService.saveCadData(testDir, "TEST_사용자")
         );
     }
 

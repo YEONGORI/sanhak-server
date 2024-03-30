@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import sanhak.shserver.cad.dto.SaveCadDatasReqDTO;
+import sanhak.shserver.cad.dto.SaveCadsReq;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,7 +35,7 @@ class CadControllerTest {
 
     @Test
     void saveCadData() throws Exception {
-        SaveCadDatasReqDTO reqDTO = SaveCadDatasReqDTO.builder()
+        SaveCadsReq reqDTO = SaveCadsReq.builder()
                 .author(testAuthor)
                 .projectFolder(testDir)
                 .build();

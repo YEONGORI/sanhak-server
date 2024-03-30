@@ -1,4 +1,4 @@
-package sanhak.shserver.utils;
+package sanhak.shserver.infra;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
@@ -48,6 +48,24 @@ public class S3Utils {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
+
+    public void downloadFile(String fileName) {
+        try {
+            fileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, fileName);
+            File file = new File(fileName);
+
+            log.info("Download file start");
+            Download download = transferManager.download(getObjectRequest, file);
+            download.waitForCompletion();
+            log.info("Download file finish");
+            log.debug("Downloaded file name: " + file.getName());
+        } catch (InterruptedException | AmazonS3Exception e) {
+            log.error(e.getMessage());
+            throw new AmazonS3Exception(e.getMessage());
+        }
+    }
+
     public void downloadFolder(String dirName) {
         try {
             dirName = URLDecoder.decode(dirName, StandardCharsets.UTF_8);
@@ -95,22 +113,6 @@ public class S3Utils {
         return pathUrl + S3FileName;
     }
 
-    public void downloadFile(String fileName) {
-        try {
-            fileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
-            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, fileName);
-            File file = new File(fileName);
-
-            log.info("Download file start");
-            Download download = transferManager.download(getObjectRequest, file);
-            download.waitForCompletion();
-            log.info("Download file finish");
-            log.debug("Downloaded file name: " + file.getName());
-        } catch (InterruptedException | AmazonS3Exception e) {
-            log.error(e.getMessage());
-            throw new AmazonS3Exception(e.getMessage());
-        }
-    }
 
     private String encryptAES256(String fileName) {
         try {

@@ -1,4 +1,4 @@
-package sanhak.shserver.config;
+package sanhak.shserver.global.config;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Configuration
-public class CadConfig {
+public class MongoConfig {
     @Value("${spring.data.mongodb.uri}")
     private String connectionString;
 

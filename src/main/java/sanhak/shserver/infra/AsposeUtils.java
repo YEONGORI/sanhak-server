@@ -1,4 +1,4 @@
-package sanhak.shserver.utils;
+package sanhak.shserver.infra;
 
 import com.aspose.cad.Image;
 import com.aspose.cad.fileformats.cad.CadImage;
@@ -12,6 +12,7 @@ import com.aspose.cad.imageoptions.JpegOptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import sanhak.shserver.infra.S3Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

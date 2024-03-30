@@ -1,4 +1,4 @@
-package sanhak.shserver;
+package sanhak.shserver.global;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
